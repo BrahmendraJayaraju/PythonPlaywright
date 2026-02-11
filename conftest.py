@@ -1,33 +1,95 @@
 import allure
 import os
+import json
+import urllib.parse
 import pytest
 from playwright.async_api import async_playwright
 
-#BROWSER=chromium pytest  (Only Chrome)
-#BROWSER=firefox pytest  (Only Firefox)
-#BROWSER=webkit pytest  (Only WebKit)
-#pytest   (All browsers (default))
+# BROWSER=chromium pytest        (Only Chromium – Local)
+# BROWSER=firefox pytest         (Only Firefox – Local)
+# BROWSER=webkit pytest          (Only WebKit – Local)
+# pytest                         (All browsers – Local, default)
+
+# EXECUTION_MODE=cloud pytest    (Cloud – LambdaTest)
+
+
+
 
 
 
 def get_browsers():
+    execution = os.getenv("EXECUTION_MODE", "local")
+
+    if execution == "cloud":
+        return ["cloud"]
+
     browser = os.getenv("BROWSER")
     if browser:
         return [browser]
+
     return ["chromium", "firefox", "webkit"]
+
+
+
 
 @pytest.fixture(params=get_browsers())
 async def page(request):
+    execution = os.getenv("EXECUTION_MODE", "local")
+
     async with async_playwright() as p:
-        browser =await getattr(p, request.param).launch(headless=False)
-        context =await browser.new_context()
-        page =await context.new_page()
+
+        # -------- CLOUD (LambdaTest) --------
+        if execution == "cloud":
+            username = os.getenv("LT_USERNAME")
+            access_key = os.getenv("LT_ACCESS_KEY")
+
+            assert username, "LT_USERNAME is not set"
+            assert access_key, "LT_ACCESS_KEY is not set"
+
+            capabilities = {
+                "browserName": "chrome",
+                "browserVersion": "142",
+                "lt:options": {
+                    "platform": "Windows 11",
+                    "build": "Playwright Python sample1",
+                    "name": "amazon test - playwright",
+                    "user": username,
+                    "accessKey": access_key,
+                    "network": True,
+                    "video": True,
+                    "console": True
+                }
+            }
+
+            caps = urllib.parse.quote(json.dumps(capabilities))
+            ws_endpoint = (
+                f"wss://cdp.lambdatest.com/playwright?capabilities={caps}"
+            )
+
+            browser = await p.chromium.connect(ws_endpoint)
+            context = await browser.new_context()
+            page = await context.new_page()
+            await page.goto("https://the-internet.herokuapp.com/")
+
+
+        # -------- LOCAL --------
+        else:
+            browser = await getattr(p, request.param).launch(
+                headless=False
+            )
+            context = await browser.new_context()
+
+        page = await context.new_page()
         await page.goto("https://the-internet.herokuapp.com/")
 
         yield page
 
         await context.close()
         await browser.close()
+
+
+
+
 
 
 

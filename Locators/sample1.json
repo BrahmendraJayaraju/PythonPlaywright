@@ -1,6 +1,7 @@
 {
-  "elementselenium": "//a[.='Elemental Selenium']"
-
+  "elementselenium": "//a[.='Elemental Selenium']",
+  "abtest": "//a[.='A/B Testing']",
+  "abwords": "//p"
 
 }
 

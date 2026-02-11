@@ -16,6 +16,12 @@ class Webutility:
         await page.locator(locator).click()
 
 
+    async def gettextandverify(self,locator,expectedtext,page):
+        await page.locator(locator).wait_for(state="visible")
+        actualtext=await page.locator(locator).inner_text()
+        assert actualtext==expectedtext, f"Text mismatch: expected '{expectedtext}', got '{actualtext}'"
+
+
 
 
 
