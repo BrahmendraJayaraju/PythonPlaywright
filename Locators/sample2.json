@@ -1,5 +1,6 @@
 {
 
 
-  "addremove": "//a[.='Add/Remove Elements']"
+  "url": "https://the-internet.herokuapp.com/",
+  "title": "The Internet"
 }

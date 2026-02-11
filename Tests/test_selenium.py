@@ -7,9 +7,8 @@ from pages.page1 import page1
 
 async def test_tc01(page:Page):
     obj1 = page1(page)
-    await obj1.clickseleniumlink()
+    await obj1.tovisiblecheck()
 
 async def test_tc02(page:Page):
     obj1 = page1(page)
-    await obj1.clickabtest()
-    await obj1.veriftextinside()
+    await obj1.clearentertext()

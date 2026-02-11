@@ -1,7 +1,7 @@
 {
-  "elementselenium": "//a[.='Elemental Selenium']",
-  "abtest": "//a[.='A/B Testing']",
-  "abwords": "//p"
+  "element": "//input[@id='target']",
+  "lin": "//a[.='Key Presses']"
+
 
 }
 

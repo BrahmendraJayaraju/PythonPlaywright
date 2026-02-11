@@ -15,19 +15,23 @@ class page1:
         self.webutil = Webutility()
         self.locator_path = "./Locators/sample1.json"
         self.datapath="./Dataset/sample1.json"
-        self.seleniumlink= self.webutil.Get_datafrom_json(self.locator_path,"elementselenium")
-        self.abtest= self.webutil.Get_datafrom_json(self.locator_path,"abtest")
-        self.abtext=self.webutil.Get_datafrom_json(self.locator_path,"abwords")
-        self.data=self.webutil.Get_datafrom_json( self.datapath,"absentense")
 
-    async def clickseleniumlink(self):
+        self.sen=self.webutil.Get_datafrom_json(self.locator_path,"lin")
 
-        await self.webutil.click_by_locator(self.seleniumlink,self.page)
+        self.element= self.webutil.Get_datafrom_json(self.locator_path,"element")
 
-
-    async def clickabtest(self):
-        await self.webutil.click_by_locator(self.abtest,self.page)
+        self.name=self.webutil.Get_datafrom_json( self.datapath,"name")
+        #self.url= self.webutil.Get_datafrom_json(self.datapath, "url")
 
 
-    async def veriftextinside(self):
-        await self.webutil.gettextandverify(self.abtext,self.data,self.page)
+    async def tovisiblecheck(self):
+
+        await self.webutil.tocheck_element_visible(self.page,"locator" ,self.sen)
+
+
+
+    async def clearentertext(self):
+        await self.webutil.click(self.page, "locator", self.sen)
+        await self.webutil.clear_entertext(self.page,"locator" ,self.element,self.name )
+
+

@@ -15,4 +15,4 @@ class page2:
         self.add=self.webutil.Get_datafrom_json(self.locator_path,"addremove")
 
     async def clickaddremove(self):
-        await self.webutil.click_by_locator(self.add, self.page)
+        await self.webutil.click( self.page,"locator",self.add)
