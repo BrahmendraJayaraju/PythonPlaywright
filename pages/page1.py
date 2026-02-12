@@ -1,37 +1,51 @@
-
-
 from playwright.async_api import Page
-
 from Utility.Webutility import Webutility
-
-
-
-
 class page1:
 
     def __init__(self, page:Page):
 
         self.page=page
+        self.page2=None
         self.webutil = Webutility()
-        self.locator_path = "./Locators/sample1.json"
-        self.datapath="./Dataset/sample1.json"
+        self.locator_path = "./Locators/locator1.json"
+        self.datapath="./Dataset/data1.json"
+        self.locator1= self.webutil.Get_datafrom_json(self.locator_path,"element1")
+        self.locator2 = self.webutil.Get_datafrom_json(self.locator_path, "element2")
+        self.locator3= self.webutil.Get_datafrom_json(self.locator_path, "element3")
+        self.locator4 = self.webutil.Get_datafrom_json(self.locator_path, "element4")
+        self.data1=self.webutil.Get_datafrom_json( self.datapath,"name")
+        self.data2 = self.webutil.Get_datafrom_json(self.datapath, "pwd")
+        self.locator5=self.webutil.Get_datafrom_json(self.locator_path, "element5")
 
-        self.sen=self.webutil.Get_datafrom_json(self.locator_path,"lin")
+    async def method1(self):
 
-        self.element= self.webutil.Get_datafrom_json(self.locator_path,"element")
+        await self.webutil.click(self.page, "locator", self.locator4)
+        a=await self.webutil.switch_to_tab(self.page, "locator", self.locator5)
+        self.page2=a
 
-        self.name=self.webutil.Get_datafrom_json( self.datapath,"name")
-        #self.url= self.webutil.Get_datafrom_json(self.datapath, "url")
+    async def  method2(self):
+        await self.webutil.tocheck_element_visible(self.page2, "locator", self.locator1)
+        a=await self.webutil.get_element_text(self.page2, "locator", self.locator1)
+        print(a)
+        await self.webutil.bring_page_to_front(self.page)
+
+        await self.webutil.scroll_to_element(self.page, "locator", self.locator2)
+        await self.webutil.close_page(self.page2)
 
 
-    async def tovisiblecheck(self):
-
-        await self.webutil.tocheck_element_visible(self.page,"locator" ,self.sen)
 
 
 
-    async def clearentertext(self):
-        await self.webutil.click(self.page, "locator", self.sen)
-        await self.webutil.clear_entertext(self.page,"locator" ,self.element,self.name )
+
+
+
+
+
+
+
+
+
+
+
 
 

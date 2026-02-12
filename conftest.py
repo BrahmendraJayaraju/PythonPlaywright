@@ -67,9 +67,9 @@ async def page(request):
             )
 
             browser = await p.chromium.connect(ws_endpoint)
-            context = await browser.new_context()
+            context = await browser.new_context()  #like incognito
             page = await context.new_page()
-            await page.goto("https://the-internet.herokuapp.com/")
+            await page.goto("https://practicetestautomation.com/practice-test-login/")
 
 
         # -------- LOCAL --------
@@ -80,7 +80,7 @@ async def page(request):
             context = await browser.new_context()
 
         page = await context.new_page()
-        await page.goto("https://the-internet.herokuapp.com/")
+        await page.goto("https://practicetestautomation.com/courses/")
 
         yield page
 
