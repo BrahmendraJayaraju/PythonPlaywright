@@ -1,0 +1,11 @@
+{
+
+
+
+"dashboardXpath":"//h6[.='Dashboard']",
+
+
+"avatar_xpath":"//li[@class='oxd-userdropdown']",
+
+"logout_xpath": "//a[.='Logout']"
+}

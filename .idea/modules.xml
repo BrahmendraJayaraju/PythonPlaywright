@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PythonPlaywright.iml" filepath="$PROJECT_DIR$/.idea/PythonPlaywright.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/PythonPlaywright_UI_Framework.iml" filepath="$PROJECT_DIR$/.idea/PythonPlaywright_UI_Framework.iml" />
     </modules>
   </component>
 </project>

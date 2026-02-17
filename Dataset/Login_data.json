@@ -1,6 +1,11 @@
 {
 
 
-  "name": "student",
-  "pwd": "Password123"
+"username":"Admin",
+"password":"admin123",
+
+"Errormessage":"Invalid credentials",
+"Invalidpassword":"hghdgdgddfdf",
+
+"loginheadertext":"Login"
 }

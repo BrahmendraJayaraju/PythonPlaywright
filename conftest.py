@@ -35,57 +35,61 @@ def get_browsers():
 @pytest.fixture(params=get_browsers())
 async def page(request):
     execution = os.getenv("EXECUTION_MODE", "local")
-
+    browser = None
+    context = None
     async with async_playwright() as p:
+        try:
+            # -------- CLOUD (LambdaTest) --------
+            if execution == "cloud":
+                username = os.getenv("LT_USERNAME")
+                access_key = os.getenv("LT_ACCESS_KEY")
 
-        # -------- CLOUD (LambdaTest) --------
-        if execution == "cloud":
-            username = os.getenv("LT_USERNAME")
-            access_key = os.getenv("LT_ACCESS_KEY")
+                assert username, "LT_USERNAME is not set"
+                assert access_key, "LT_ACCESS_KEY is not set"
 
-            assert username, "LT_USERNAME is not set"
-            assert access_key, "LT_ACCESS_KEY is not set"
-
-            capabilities = {
-                "browserName": "chrome",
-                "browserVersion": "142",
-                "lt:options": {
-                    "platform": "Windows 11",
-                    "build": "Playwright Python sample1",
-                    "name": "amazon test - playwright",
-                    "user": username,
-                    "accessKey": access_key,
-                    "network": True,
-                    "video": True,
-                    "console": True
+                capabilities = {
+                    "browserName": "chrome",
+                    "browserVersion": "142",
+                    "lt:options": {
+                        "platform": "Windows 11",
+                        "build": "Playwright Python sample1",
+                        "name": "amazon test - playwright",
+                        "user": username,
+                        "accessKey": access_key,
+                        "network": True,
+                        "video": True,
+                        "console": True
+                    }
                 }
-            }
 
-            caps = urllib.parse.quote(json.dumps(capabilities))
-            ws_endpoint = (
-                f"wss://cdp.lambdatest.com/playwright?capabilities={caps}"
-            )
+                caps = urllib.parse.quote(json.dumps(capabilities))
+                ws_endpoint = (
+                    f"wss://cdp.lambdatest.com/playwright?capabilities={caps}"
+                )
 
-            browser = await p.chromium.connect(ws_endpoint)
-            context = await browser.new_context()  #like incognito
-            page = await context.new_page()
-            await page.goto("https://practicetestautomation.com/practice-test-login/")
+                browser = await p.chromium.connect(ws_endpoint)
+                context = await browser.new_context()  # like incognito
+                page = await context.new_page()
+                await page.goto("https://practicetestautomation.com/practice-test-login/")
 
 
-        # -------- LOCAL --------
-        else:
-            browser = await getattr(p, request.param).launch(
-                headless=False
-            )
-            context = await browser.new_context()
+            # -------- LOCAL --------
+            else:
+                browser = await getattr(p, request.param).launch(headless=False)
+                context = await browser.new_context(viewport=None)
+                page = await context.new_page()
+                await page.goto("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login")
+                await page.wait_for_load_state("networkidle")
 
-        page = await context.new_page()
-        await page.goto("https://practicetestautomation.com/courses/")
+            yield page
 
-        yield page
 
-        await context.close()
-        await browser.close()
+        finally:
+
+            if context:
+                await context.close()
+            if browser:
+                await browser.close()
 
 
 
@@ -104,7 +108,7 @@ def pytest_runtest_makereport(item, call):
 
 # async fixture runs after each test and can await screenshot
 @pytest.fixture(autouse=True)
-async def screenshot_on_finish(request, page):
+async def screenshot_on_finish_AfterMethod(request, page):
     yield
 
     rep = getattr(request.node, "rep_call", None)

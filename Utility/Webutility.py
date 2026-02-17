@@ -1,6 +1,14 @@
 import json
+import os
 import re
-from playwright.async_api import expect
+from PIL import Image, ImageChops
+import allure
+from playwright.async_api import expect, Page
+
+
+import asyncio
+
+from playwright.async_api import Page
 
 class Webutility:
 
@@ -23,7 +31,7 @@ class Webutility:
                 kwargs = {k: v for k, v in locator_value.items() if k != "role"}
                 element = page.get_by_role(role, **kwargs)
             else:
-                element = page.get_by_role(locator_value)
+                element = page.get_by_role("button", name=locator_value)
         elif locator_type == "label":
             element = page.get_by_label(locator_value)
         elif locator_type == "alt_text":
@@ -42,10 +50,11 @@ class Webutility:
         return element
 
     # Click an element
-    async def click(self, page, locator_type, locator_value, index=None):
+    async def clickwebelement(self, page:Page, locator_type, locator_value, index=None):
         element = self._get_locator(page, locator_type, locator_value, index)
         await element.scroll_into_view_if_needed()
         await element.wait_for(state="visible")
+        await element.is_enabled()
         await element.click()
 
     # Compare text
@@ -64,7 +73,7 @@ class Webutility:
         await element.fill(text_to_fill)
 
     # Type text with delay
-    async def enter_by_type(self, page, locator_type, locator_value, text_to_type, index=None, delay=50):
+    async def enter_by_type(self, page, locator_type, locator_value, text_to_type, index=None, delay=5):
         element = self._get_locator(page, locator_type, locator_value, index)
         await element.scroll_into_view_if_needed()
         await element.wait_for(state="visible")
@@ -192,6 +201,247 @@ class Webutility:
    #to close particular tab
     async def close_page(self, page):
         await page.close()
+
+    #if you want to atatch screenshot after each step
+    @staticmethod
+    async def attach_screenshot(page: Page, step_name: str, message: str):
+        # Attach text
+        allure.attach(message, name=f"{step_name} - Text", attachment_type=allure.attachment_type.TEXT)
+        # Attach screenshot
+        screenshot = await page.screenshot(full_page=True)
+        allure.attach(screenshot, name=f"{step_name} - Screenshot", attachment_type=allure.attachment_type.PNG)
+
+    #keyboard actions  using mac , for windows some keys differs
+    # to press single key like tab , enter
+    async def press_key(self, page, key: str):
+        await page.keyboard.press(key)
+
+    #enter the text , macos
+    async def type_text(self, page, text: str, delay: int = 50):
+        await page.keyboard.type(text, delay=delay)
+
+
+   #control+c and control+v like this actions , macos
+    async def shortcut(self, page: Page, *keys: str):
+        # Press all keys down
+        for key in keys:
+            await page.keyboard.down(key)
+        # Release all keys in reverse order
+        for key in reversed(keys):
+            await page.keyboard.up(key)
+
+    # to press key and hold it for some time , macos
+    async def press_and_hold(self, page: Page, key: str, duration: float = 1):
+        await page.keyboard.down(key)
+        await page.wait_for_timeout(duration * 1000)
+        await page.keyboard.up(key)
+
+    #to clear using backspace macos
+    async def clear_input(self, page: Page, selector: str):
+        await page.locator(selector).click()
+        await page.keyboard.press("Meta+A")
+        await page.keyboard.press("Backspace")
+
+    #to drag and drop
+    async def drag_and_drop(self, page, source_locator_type, source_locator_value, target_locator_type,
+                            target_locator_value, source_index=None, target_index=None):
+        source = self._get_locator(page, source_locator_type, source_locator_value, source_index)
+        target = self._get_locator(page, target_locator_type, target_locator_value, target_index)
+        await source.scroll_into_view_if_needed()
+        await target.scroll_into_view_if_needed()
+        await source.drag_to(target)
+
+    # Vertical scroll by a specific amount
+    async def scroll_vertical(self, page: Page, pixels: int = 500, delay_ms: int = 3000):
+        await page.wait_for_timeout(delay_ms)
+        await page.mouse.wheel(0, pixels)
+
+    # Horizontal scroll by a specific amount
+    async def scroll_horizontal(self, page: Page, pixels: int = 500, delay_ms: int = 3000):
+        await page.wait_for_timeout(delay_ms)
+        await page.mouse.wheel(pixels, 0)
+
+    # Scroll both horizontally and vertically
+    async def scroll_both(self, page: Page, horizontal_pixels: int = 500, vertical_pixels: int = 500,
+                          delay_ms: int = 3000):
+        await page.wait_for_timeout(delay_ms)
+        await page.mouse.wheel(horizontal_pixels, vertical_pixels)
+
+    # Left click (default)
+    async def left_click(self, page: Page, locator_type: str, locator_value: str, index: int = None,
+                         delay_ms: int = 3000):
+        element = self._get_locator(page, locator_type, locator_value, index)
+        await element.scroll_into_view_if_needed()
+        await page.wait_for_timeout(delay_ms)
+        await element.click()
+
+    # Right click
+    async def right_click(self, page: Page, locator_type: str, locator_value: str, index: int = None,
+                          delay_ms: int = 3000):
+        element = self._get_locator(page, locator_type, locator_value, index)
+        await element.scroll_into_view_if_needed()
+        await page.wait_for_timeout(delay_ms)
+        await element.click(button="right")
+
+    # Double click
+    async def double_click(self, page: Page, locator_type: str, locator_value: str, index: int = None,
+                           delay_ms: int = 3000):
+        element = self._get_locator(page, locator_type, locator_value, index)
+        await element.scroll_into_view_if_needed()
+        await page.wait_for_timeout(delay_ms)
+        await element.dblclick()
+
+
+    #click on ok  in alert
+    async def accept_alert(self, page: Page):
+        async def handle_dialog(dialog):
+            await dialog.accept()
+
+        page.once("dialog", handle_dialog)
+
+
+    #click on cancel  in alert
+    async def dismiss_alert(self, page: Page):
+        async def handle_dialog(dialog):
+            await dialog.dismiss()
+
+        page.once("dialog", handle_dialog)
+
+    #send text in alert
+    async def accept_prompt_with_text(self, page: Page, text: str):
+        async def handle_prompt(dialog):
+            await dialog.accept(text)
+
+        page.once("dialog", handle_prompt)
+
+    #get text in alert
+    # Trigger the alert while waiting for it
+    async def get_alert_text(self, page: Page, click_locator: str) -> str:
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
+
+        async def handle_dialog(dialog):
+            future.set_result(dialog.message)
+            await dialog.accept()
+
+        page.once("dialog", handle_dialog)
+        await page.locator(click_locator).click()
+        return await future
+
+
+
+   #file upload
+    async def upload_file(self, page: Page, locator_type: str, locator_value: str, file_path: str, index: int = None):
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"File not found: {file_path}")
+        element = self._get_locator(page, locator_type, locator_value, index)
+        await element.scroll_into_view_if_needed()
+        await element.wait_for(state="visible")
+        await element.set_input_files(file_path)
+        return element
+
+    #file download and attach in allure report
+    async def download_file( self,page: Page,locator_type: str,locator_value: str,download_dir: str = None, index: int = None) :
+        if download_dir is None:
+            download_dir = os.path.join(os.getcwd(), "Downloads")
+        os.makedirs(download_dir, exist_ok=True)
+        element = self._get_locator(page, locator_type, locator_value, index)
+        async with page.expect_download() as download_info:
+            await element.click()
+        download = await download_info.value
+        file_path = os.path.join(download_dir, download.suggested_filename)
+        await download.save_as(file_path)
+        with open(file_path, "rb") as f:
+            allure.attach(
+                f.read(),
+                name=download.suggested_filename,
+                attachment_type=allure.attachment_type.TEXT
+            )
+        assert os.path.exists(file_path), f"File not found: {file_path}"
+        return file_path
+
+
+
+
+    # to compare two images
+    async def compareimages(self, page: Page, image1: str, image2: str):
+        await asyncio.to_thread(self._compare_images_sync, image1, image2)
+
+    def _compare_images_sync(self, image1: str, image2: str):
+        image1 = Image.open(image1).convert("RGB")
+        image2 = Image.open(image2).convert("RGB")
+
+        assert image1.size == image2.size, "Images have different sizes"
+
+        diff = ImageChops.difference(image1, image2)
+        assert diff.getbbox() is None, "Images are different"
+
+
+    #to switch to specific frame
+
+    async def  switchtoframe(self,page:Page,locator_type, locator_value, index=None):
+
+          element = self._get_locator(page, locator_type, locator_value, index)
+          return page.frame_locator(element )
+
+   #select either future date or previous date or current date
+    #only if not inside the frame use this
+    async def select_date(
+            self,
+            page: Page,
+            datepicker_locator_type: str,
+            datepicker_locator_value: str,
+            target_day: int,
+            target_month: str,
+            target_year: int,
+            month_locator_type: str,
+            month_locator_value: str,
+            year_locator_type: str,
+            year_locator_value: str,
+            prev_button_locator_type: str,
+            prev_button_locator_value: str,
+            next_button_locator_type: str,
+            next_button_locator_value: str,
+            day_locator_type: str,
+            day_locator_template: str,
+            index: int = None
+    ):
+
+        months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ]
+
+
+        # Get the datepicker container
+        element=self._get_locator(page, datepicker_locator_type, datepicker_locator_value, index)
+        await element.scroll_into_view_if_needed()
+        await element.click()
+
+        while True:
+            current_month = (
+                await self._get_locator( page,month_locator_type, month_locator_value).text_content()).strip()
+            current_year = (
+                await self._get_locator( page,year_locator_type, year_locator_value).text_content()).strip()
+
+            print(f"Current: {current_month} {current_year}")
+
+            # If target reached, click the date
+            if current_month == target_month and int(current_year) == target_year:
+                day_locator_value = day_locator_template.format(day=target_day)
+                await self._get_locator(page,day_locator_type, day_locator_value).click()
+                break
+
+            # Determine direction
+            current_month_index = months.index(current_month)
+            target_month_index = months.index(target_month)
+
+            if int(current_year) > target_year or (
+                    int(current_year) == target_year and current_month_index > target_month_index
+            ):
+                await self._get_locator(page, prev_button_locator_type, prev_button_locator_value).click()
+            else:
+                await self._get_locator(page,next_button_locator_type, next_button_locator_value).click()
 
 
 

@@ -1,11 +1,13 @@
 {
-  "element1": "//h1[.='Selenium WebDriver: Selenium Automation Testing with Java']",
-  "element2":"//a[.='Advanced Selenium testing framework with Java']",
-    "element3":"#submit",
-  "element4":"//a[text()='Courses']",
-    "element5":"//a[text()='Selenium WebDriver: Selenium Automation Testing with Java']"
+ "username_xpath": "//input[@name='username']",
+"password_xpath":"//input[@name='password']",
+
+"login_btn_xpath":"//button[.=' Login ']",
+
+"invalidpassworderror_xpath":"//p[.='Invalid credentials']",
 
 
+"loginheader":"//h5[.='Login']"
 
 
 }

@@ -1,31 +1,52 @@
+import pytest
 
 from Utility.Webutility import Webutility
 
 
 from playwright.async_api import Page
 
-from pages.page1 import page1
+from pages.DashboardPage import Dashboard
+from pages.LoginPage import  Login
 
 
-#@pytest.mark.smoke
-#@pytest.mark.dependency(depends=["TC1"])
-#@pytest.mark.order(2)
-#@pytest.mark.skip()
-
+#@pytest.mark.smoke (to execute based on tags)
+#@pytest.mark.order(2)  (to execute in order wise )
+#@pytest.mark.skip() (to skip)
 #@allure.step("validating amazon login with valid credentials") it will not support aync mode
 
-async def test_tc01(page:Page):
-    obj1 = page1(page)
+#@pytest.mark.dependency(name=["TC1"])
+async def test_valid_login_test(page:Page):
+    obj1 = Login(page)
+    await obj1.EnterUsername()
+    await Webutility.attach_screenshot(page, step_name="enter username", message="able to enter username successfully")
 
-    # Step 1
-    await obj1.method1()
-    await Webutility.attach_screenshot(page, step_name="Login Step", message="Opened login page successfully")
 
-    # Step 2
-    #await obj1.method2()
-    #await Webutility.attach_screenshot(page, step_name="After Actions", message="Completed actions successfully")
+    await obj1.Enterpassword()
+    await Webutility.attach_screenshot(page, step_name="enter password", message="able to enter password successfully")
 
-#@pytest.mark.dependency(name="TC1")
-#async def test_tc02(page:Page):
-   # obj1 = page1(page)
-    #await obj1.clearentertext()
+    await obj1.clickonlogin()
+    await Webutility.attach_screenshot(page, step_name="click login", message="able to login")
+
+
+    obj2=Dashboard(page)
+    await obj2.verifyDashboardTitle()
+    await Webutility.attach_screenshot(page, step_name="verify title", message="landed on Dashboard Page")
+
+#@pytest.mark.dependency(depends="TC1")
+async def test_invalid_login_test(page:Page):
+    obj1 = Login(page)
+    await obj1.EnterUsername()
+    await Webutility.attach_screenshot(page, step_name="enter invalid username", message="able to enter invalid username successfully")
+
+    await obj1.Entervalidpassword()
+    await Webutility.attach_screenshot(page, step_name="enter invalid password", message="able to enter invalid password successfully")
+
+    await obj1.clickonlogin()
+    await Webutility.attach_screenshot(page, step_name="click login", message="able to login ")
+
+    await obj1.verifyerrormessage()
+    await Webutility.attach_screenshot(page, step_name="verify error", message="able to validate error message ")
+
+
+
+
