@@ -75,7 +75,7 @@ async def page(request):
 
             # -------- LOCAL --------
             else:
-                browser = await getattr(p, request.param).launch(headless=False)
+                browser = await getattr(p, request.param).launch(headless=True)
                 context = await browser.new_context(viewport=None)
                 page = await context.new_page()
                 await page.goto("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login")
