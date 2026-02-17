@@ -1,8 +1,7 @@
 name: Playwright Tests with Allure
 
-# Trigger on push, daily schedule, or manual
 on:
-  workflow_dispatch:   # Manual trigger button
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -54,16 +53,16 @@ jobs:
         run: |
           allure generate allure-results --clean -o allure-report
 
-      # 8️⃣ Upload Allure HTML report as artifact
+      # 8️⃣ Upload Allure HTML report as artifact (updated to v4)
       - name: Upload Allure Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      # 9️⃣ Upload raw Allure results as artifact
+      # 9️⃣ Upload raw Allure results as artifact (updated to v4)
       - name: Upload Allure Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: allure-results
           path: allure-results
