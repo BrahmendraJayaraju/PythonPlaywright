@@ -35,7 +35,7 @@ jobs:
       # Verify Allure
       - name: Verify Allure
         shell: powershell
-        run: cmd /c "$Env:ALLURE_BIN --version"
+        run: cmd.exe /c "$Env:ALLURE_BIN --version"
 
       # Install dependencies
       - name: Install Python dependencies
@@ -60,7 +60,7 @@ jobs:
       # Generate Allure Report
       - name: Generate Allure Report
         shell: powershell
-        run: cmd /c "$Env:ALLURE_BIN generate allure-results --clean -o allure-report"
+        run: cmd.exe /c "$Env:ALLURE_BIN generate allure-results --clean -o allure-report"
 
       # Upload Allure HTML report
       - name: Upload Allure Report
