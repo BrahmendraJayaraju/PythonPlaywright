@@ -1,12 +1,12 @@
 name: Playwright Tests with Allure (Windows)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:      # Manual trigger
   push:
     branches:
       - main
   schedule:
-    - cron: '0 18 * * *'
+    - cron: '0 18 * * *'  # Daily at 6 PM UTC
 
 jobs:
   run-tests:
@@ -14,60 +14,67 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
-      # Install Allure CLI
+      # 3️⃣ Install Allure CLI (Windows-compatible)
       - name: Install Allure CLI
         shell: powershell
         run: |
-          curl -L -o allure.zip https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.zip
-          Expand-Archive -Path allure.zip -DestinationPath $Env:USERPROFILE\allure
-          $Env:ALLURE_HOME = "$Env:USERPROFILE\allure\allure-2.27.0\bin"
+          $zipPath = "$Env:TEMP\allure.zip"
+          $destPath = "$Env:USERPROFILE\allure"
+
+          Invoke-WebRequest -Uri "https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.zip" -OutFile $zipPath
+          Expand-Archive -Path $zipPath -DestinationPath $destPath
+
+          $Env:ALLURE_HOME = "$destPath\allure-2.27.0\bin"
           $Env:PATH = "$Env:ALLURE_HOME;$Env:PATH"
 
-      # Verify Allure
+      # 4️⃣ Verify Allure installation
       - name: Verify Allure
         shell: powershell
         run: allure.bat --version
 
-      # Install dependencies
-      - name: Install Python dependencies
+      # 5️⃣ Install Python dependencies and Playwright browsers
+      - name: Install dependencies
+        shell: powershell
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install
 
-      # Clean previous Allure results
+      # 6️⃣ Clean previous Allure results
       - name: Clean Allure results
         shell: powershell
         run: |
           if (Test-Path allure-results) { Remove-Item -Recurse -Force allure-results }
           if (Test-Path allure-report) { Remove-Item -Recurse -Force allure-report }
 
-      # Run Pytest
+      # 7️⃣ Run Pytest (headless, verbose, all logs)
       - name: Run Pytest
         shell: powershell
         run: python -m pytest -n 3 -s -v --capture=no --alluredir=allure-results
 
-      # Generate Allure report
+      # 8️⃣ Generate Allure report
       - name: Generate Allure Report
         shell: powershell
         run: allure.bat generate allure-results --clean -o allure-report
 
-      # Upload Allure HTML report
+      # 9️⃣ Upload Allure HTML report
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      # Upload raw Allure results
+      # 🔟 Upload raw Allure results
       - name: Upload Allure Results
         uses: actions/upload-artifact@v4
         with:
