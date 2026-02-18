@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 18 * * *'   # Daily 6 PM UTC
+    - cron: '10 18 * * *'   # Daily 6 PM UTC
 
 jobs:
   run-tests:
