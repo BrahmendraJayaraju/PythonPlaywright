@@ -1,12 +1,12 @@
 name: Playwright Tests with Allure (Windows)
 
 on:
-  workflow_dispatch:        # Manual trigger
+  workflow_dispatch:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 18 * * *'     # Daily 6 PM UTC
+    - cron: '0 18 * * *'   # Daily 6 PM UTC
 
 jobs:
   run-tests:
@@ -53,7 +53,7 @@ jobs:
             -OutFile $zipPath
           Expand-Archive -Path $zipPath -DestinationPath $destPath -Force
 
-      # 7️⃣ Verify Allure installation
+      # 7️⃣ Verify Allure
       - name: Verify Allure
         shell: powershell
         run: |
