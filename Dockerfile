@@ -4,10 +4,10 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Copy requirements first (best practice for caching)
-COPY requirement.txt .
+COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirement.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright dependencies (browsers not needed locally, but system deps are)
 RUN playwright install --with-deps
