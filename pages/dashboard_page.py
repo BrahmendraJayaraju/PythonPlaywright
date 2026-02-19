@@ -1,6 +1,6 @@
 from playwright.async_api import Page
-import asyncio
-from Utility.Webutility import Webutility
+
+from utils.Webutility import Webutility
 
 
 
@@ -10,9 +10,9 @@ class Dashboard:
     def __init__(self, page:Page):
         self.page=page
         self.webutil = Webutility()
-        self.locator_path = "./Locators/Dashboard_locator.json"
-        self.data_path = "./Dataset/Login_data.json"
-        self.data_path_dashboard = "./Dataset/Dashboard_data.json"
+        self.locator_path = "./locators/Dashboard_locator.json"
+        self.data_path = "./test_data/Login_data.json"
+        self.data_path_dashboard = "./test_data/Dashboard_data.json"
 
         self.avatar=self.webutil.Get_datafrom_json(self.locator_path,"avatar_xpath")
         self.logout = self.webutil.Get_datafrom_json(self.locator_path, "logout_xpath")

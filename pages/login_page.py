@@ -1,5 +1,5 @@
 from playwright.async_api import Page
-from Utility.Webutility import Webutility
+from utils.Webutility import Webutility
 
 
 
@@ -10,11 +10,11 @@ class Login:
         self.page=page
         self.page2=None
         self.webutil = Webutility()
-        self.locator_path = "./Locators/login_locator.json"
-        self.datapath="./Dataset/Login_data.json"
+        self.locator_path = "./locators/login_locator.json"
+        self.datapath="./test_data/Login_data.json"
 
-        self.locator_path_dashboard = "./Locators/Dashboard_locator.json"
-        self.datapath_dashboard = "./Dataset/Dashboard_data.json"
+        self.locator_path_dashboard = "./locators/Dashboard_locator.json"
+        self.datapath_dashboard = "./test_data/Dashboard_data.json"
 
         self.username= self.webutil.Get_datafrom_json(self.locator_path,"username_xpath")
         self.password = self.webutil.Get_datafrom_json(self.locator_path, "password_xpath")

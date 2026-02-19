@@ -1,12 +1,12 @@
-import pytest
 
-from Utility.Webutility import Webutility
+
+from utils.Webutility import Webutility
 
 
 from playwright.async_api import Page
 
-from pages.DashboardPage import Dashboard
-from pages.LoginPage import  Login
+from pages.dashboard_page import Dashboard
+from pages.login_page import  Login
 
 
 #@pytest.mark.smoke (to execute based on tags)

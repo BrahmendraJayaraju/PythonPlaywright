@@ -1,4 +1,4 @@
-name: Playwright Tests with Allure (Windows)
+name: Playwright tests with Allure (Windows)
 
 on:
   workflow_dispatch:

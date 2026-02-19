@@ -1,8 +1,8 @@
 from playwright.async_api import Page
 
-from Utility.Webutility import Webutility
-from pages.DashboardPage import Dashboard
-from pages.LoginPage import Login
+from utils.Webutility import Webutility
+from pages.dashboard_page import Dashboard
+from pages.login_page import Login
 
 
 async def test_verify_logout(page:Page):
@@ -28,5 +28,5 @@ async def test_verify_logout(page:Page):
 
     await obj1.verifyloginpage()
     await Webutility.attach_screenshot(page, step_name="verify login page", message="user was able to land on login page")
-    await obj2.test_postgres_async()
+
 
