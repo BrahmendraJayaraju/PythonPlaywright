@@ -25,4 +25,4 @@ allure-pytest
 
 
 # tow work with DB
-#pip install aiomysql asyncpg
+aiomysql
