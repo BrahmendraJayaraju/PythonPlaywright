@@ -1,6 +1,9 @@
 import json
 import os
 import re
+
+import aiomysql
+import asyncpg
 from PIL import Image, ImageChops
 import allure
 from playwright.async_api import expect, Page
@@ -442,6 +445,53 @@ class Webutility:
                 await self._get_locator(page, prev_button_locator_type, prev_button_locator_value).click()
             else:
                 await self._get_locator(page,next_button_locator_type, next_button_locator_value).click()
+
+
+
+    async def execute_db_query_async(
+            self,
+            db_type,
+            host,
+            user,
+            password,
+            database,
+            port,
+            query
+    ):
+        if db_type == "mysql":
+            conn = await aiomysql.connect(
+                host=host,
+                user=user,
+                password=password,
+                db=database,
+                port=port
+            )
+
+            async with conn.cursor() as cursor:
+                await cursor.execute(query)
+                result = await cursor.fetchall()
+
+            conn.close()
+            return result
+
+        elif db_type == "postgres":
+            conn = await asyncpg.connect(
+                host=host,
+                user=user,
+                password=password,
+                database=database,
+                port=port
+            )
+
+            result = await conn.fetch(query)
+            await conn.close()
+
+            # Convert asyncpg Record → tuple (to match MySQL output)
+            return [tuple(row) for row in result]
+
+        else:
+            raise ValueError("Unsupported database type")
+
 
 
 

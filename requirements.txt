@@ -22,3 +22,7 @@ requests
 # Logging / reporting
 python-json-logger
 allure-pytest
+
+
+# tow work with DB
+#pip install aiomysql asyncpg

@@ -28,3 +28,5 @@ async def test_verify_logout(page:Page):
 
     await obj1.verifyloginpage()
     await Webutility.attach_screenshot(page, step_name="verify login page", message="user was able to land on login page")
+    await obj2.test_postgres_async()
+

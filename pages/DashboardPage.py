@@ -1,5 +1,5 @@
 from playwright.async_api import Page
-
+import asyncio
 from Utility.Webutility import Webutility
 
 
@@ -29,5 +29,12 @@ class Dashboard:
 
     async def verifyDashboardTitle(self):
         await self.webutil.compare_text(self.page, "locator", self.dashboard,self.dashboardtext)
+
+
+
+
+
+
+
 
 

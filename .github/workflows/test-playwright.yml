@@ -14,35 +14,35 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1 Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
+      # 2 Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      # 3️⃣ Upgrade pip
+      # 3 Upgrade pip
       - name: Upgrade pip
         shell: powershell
         run: |
           python -m pip install --upgrade pip
 
-      # 4️⃣ Install Python dependencies
+      # 4 Install Python dependencies
       - name: Install Python dependencies
         shell: powershell
         run: |
           pip install -r requirements.txt
 
-      # 5️⃣ Install Playwright browsers
+      # 5Install Playwright browsers
       - name: Install Playwright browsers
         shell: powershell
         run: |
           python -m playwright install --with-deps
 
-      # 6️⃣ Install Allure CLI
+      # 6Install Allure CLI
       - name: Install Allure CLI
         shell: powershell
         run: |
@@ -53,40 +53,40 @@ jobs:
             -OutFile $zipPath
           Expand-Archive -Path $zipPath -DestinationPath $destPath -Force
 
-      # 7️⃣ Verify Allure
+      # 7Verify Allure
       - name: Verify Allure
         shell: powershell
         run: |
           & "$Env:USERPROFILE\allure\allure-2.27.0\bin\allure.bat" --version
 
-      # 8️⃣ Clean previous Allure results
+      # 8Clean previous Allure results
       - name: Clean Allure results
         shell: powershell
         run: |
           if (Test-Path allure-results) { Remove-Item -Recurse -Force allure-results }
           if (Test-Path allure-report) { Remove-Item -Recurse -Force allure-report }
 
-      # 9️⃣ Run Pytest
+      # 9Run Pytest
       - name: Run Pytest
         shell: powershell
         run: |
           python -m pytest -n 3 -s -v --capture=no --alluredir=allure-results
 
-      # 🔟 Generate Allure Report
+      # Generate Allure Report
       - name: Generate Allure Report
         shell: powershell
         run: |
           & "$Env:USERPROFILE\allure\allure-2.27.0\bin\allure.bat" `
             generate allure-results --clean -o allure-report
 
-      # 1️⃣1️⃣ Upload Allure HTML report
+      # Upload Allure HTML report
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: allure-report
 
-      # 1️⃣2️⃣ Upload raw Allure results
+      # Upload raw Allure results
       - name: Upload Allure Results
         uses: actions/upload-artifact@v4
         with:
